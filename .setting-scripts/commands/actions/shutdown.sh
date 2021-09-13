@@ -1,0 +1,1 @@
+echo $1 | sudo -S shutdown 0
