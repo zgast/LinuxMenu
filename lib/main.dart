@@ -10,6 +10,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Map<String, String> envVars = Platform.environment;
     path = envVars['HOME'].toString();
     path = path + "/.setting-scripts";
+
     return Scaffold(
       body: Center(
         child: Column(
@@ -27,22 +28,32 @@ class _MyHomePageState extends State<MyHomePage> {
                           title: 'Bluetooth',
                           leading: Icon(Icons.bluetooth),
                           onPressed: (BuildContext context) async {
-                            await _displayTextInputDialog(context);
-
-                            shell.run(
-                                "bash $path/commands/settings/bluetooth.sh $valueText");
-                            valueText = "";
+                            sudoWrapper(
+                                context, "/commands/settings/bluetooth.sh");
                           },
                         ),
                         SettingsTile(
                           title: 'Internet',
                           leading: Icon(Icons.wifi),
                           onPressed: (BuildContext context) async {
-                            await _displayTextInputDialog(context);
-
-                            shell.run(
-                                "bash $path/commands/settings/internet.sh $valueText");
-                            valueText = "";
+                            sudoWrapper(
+                                context, "/commands/settings/internet.sh");
+                          },
+                        ),
+                        SettingsTile(
+                          title: 'Appearance',
+                          leading: Icon(Icons.palette),
+                          onPressed: (BuildContext context) async {
+                            sudoWrapper(
+                                context, "/commands/settings/appearance.sh");
+                          },
+                        ),
+                        SettingsTile(
+                          title: 'Monitors',
+                          leading: Icon(Icons.desktop_windows),
+                          onPressed: (BuildContext context) async {
+                            sudoWrapper(
+                                context, "/commands/settings/monitors.sh");
                           },
                         ),
                       ],
@@ -51,21 +62,20 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: 'Brightness',
                       tiles: [
                         SettingsTile(
-                          title: 'Brightness up',
+                          title: 'Brightness slider',
                           leading: Icon(Icons.brightness_5),
-                          onPressed: (BuildContext context) {
-                            shell.run("bash $path/commands/brightness/up.sh");
-                          },
-                        ),
-                        SettingsTile(
-                          title: 'Brightness down',
-                          leading: Icon(Icons.light_mode),
-                          onPressed: (BuildContext context) {
-                            String os = Platform.operatingSystem;
-                            String home = "";
-                            Map<String, String> envVars = Platform.environment;
-                            print(os);
-                            shell.run("bash $path/commands/brightness/down.sh");
+                          onPressed: (BuildContext context) async {
+                            await _displayTextInputDialog(
+                                context, "Enter brightness level", false);
+                            var brightness =
+                                (double.parse(valueText) * 2.5).toString();
+
+                            await _displayTextInputDialog(
+                                context, "Enter sudo password", true);
+
+                            shell.run(
+                                "bash $path/commands/brightness/change.sh $valueText $brightness");
+                            valueText = "";
                           },
                         ),
                       ],
@@ -110,33 +120,23 @@ class _MyHomePageState extends State<MyHomePage> {
                           title: 'Log out',
                           leading: Icon(Icons.logout),
                           onPressed: (BuildContext context) async {
-                            await _displayTextInputDialog(context);
-
-                            shell.run(
-                                "bash $path/commands/actions/logout.sh $valueText");
-                            valueText = "";
+                            sudoWrapper(
+                                context, "path/commands/actions/logout.sh");
                           },
                         ),
                         SettingsTile(
                           title: 'Reboot',
                           leading: Icon(Icons.restart_alt),
                           onPressed: (BuildContext context) async {
-                            await _displayTextInputDialog(context);
-
-                            shell.run(
-                                "bash $path/commands/actions/reboot.sh $valueText");
-                            valueText = "";
+                            sudoWrapper(context, "/commands/actions/reboot.sh");
                           },
                         ),
                         SettingsTile(
                           title: 'Power off',
                           leading: Icon(Icons.power_settings_new),
                           onPressed: (BuildContext context) async {
-                            await _displayTextInputDialog(context);
-
-                            shell.run(
-                                "bash $path/commands/actions/shutdown.sh $valueText");
-                            valueText = "";
+                            sudoWrapper(
+                                context, "/commands/actions/shutdown.sh");
                           },
                         ),
                       ],
@@ -149,6 +149,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Future<void> sudoWrapper(BuildContext context, String shellfile) async {
+    await _displayTextInputDialog(context, "Enter sudo password", true);
+
+    shell.run("bash $path$shellfile $valueText");
+    valueText = "";
+  }
+
   var shell = Shell();
 
   String codeDialog = "";
@@ -157,14 +164,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   TextEditingController _textFieldController = TextEditingController();
 
-  Future<void> _displayTextInputDialog(BuildContext context) async {
+  Future<void> _displayTextInputDialog(
+      BuildContext context, String heading, bool password) async {
     return showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Enter sudo password'),
+            title: Text(heading),
             content: TextField(
-              obscureText: true,
+              obscureText: password ? true : false,
               onChanged: (value) {
                 setState(() {
                   valueText = value;
@@ -178,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
               },
               controller: _textFieldController,
-              decoration: InputDecoration(hintText: "password"),
+              decoration: InputDecoration(labelText: "Enter value"),
             ),
             actions: <Widget>[
               FlatButton(
@@ -208,6 +216,15 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         });
   }
+}
+
+void rebuildAllChildren(BuildContext context) {
+  void rebuild(Element el) {
+    el.markNeedsBuild();
+    el.visitChildren(rebuild);
+  }
+
+  (context as Element).visitChildren(rebuild);
 }
 
 void main() {
