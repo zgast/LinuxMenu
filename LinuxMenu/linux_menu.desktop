@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=LinuxMenu
+Comment=A 3rd party settings menu for
+Exec=/opt/LinuxMenu/dwm_menu
+Type=Application
+StartupNotify=true
