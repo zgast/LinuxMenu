@@ -1,7 +1,18 @@
 # LinuxMenu
 
-A SettingsWindow for WindowsManager like DWM oder i3wm
+A 3rd party settings App for wms like DWM oder i3wm
 
-## How to use it
+## Install
+```
+wget https://github.com/zgast/LinuxMenu/releases/download/1.0/LinuxMenu.tar.xz
+tar -xf LinuxMenu.tar.xz
+cd ./LinuxMenu/
+bash ./install.sh
+```
+## Uninstall
 
-copy the .settings-scripts folder in your homefolder and start the binary
+Execute the uninstall.sh in the LinuxMenu directory
+
+## Look
+
+![](https://data.zgast.at/LinuxMenu/image.png)
