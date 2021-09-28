@@ -28,32 +28,28 @@ class _MyHomePageState extends State<MyHomePage> {
                           title: 'Bluetooth',
                           leading: Icon(Icons.bluetooth),
                           onPressed: (BuildContext context) async {
-                            sudoWrapper(
-                                context, "/commands/settings/bluetooth.sh");
+                            shell.run("bash $path/commands/settings/bluetooth.sh");
                           },
                         ),
                         SettingsTile(
                           title: 'Internet',
                           leading: Icon(Icons.wifi),
                           onPressed: (BuildContext context) async {
-                            sudoWrapper(
-                                context, "/commands/settings/internet.sh");
+                            shell.run("bash $path/commands/settings/internet.sh");
                           },
                         ),
                         SettingsTile(
                           title: 'Appearance',
                           leading: Icon(Icons.palette),
                           onPressed: (BuildContext context) async {
-                            sudoWrapper(
-                                context, "/commands/settings/appearance.sh");
+                            shell.run("bash $path/commands/settings/appearance.sh");
                           },
                         ),
                         SettingsTile(
                           title: 'Monitors',
                           leading: Icon(Icons.desktop_windows),
                           onPressed: (BuildContext context) async {
-                            sudoWrapper(
-                                context, "/commands/settings/monitors.sh");
+                            shell.run("bash $path/commands/settings/monitors.sh");
                           },
                         ),
                       ],
@@ -84,17 +80,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: 'Sound',
                       tiles: [
                         SettingsTile(
-                          title: 'Sound up',
+                          title: 'Sound Settings',
                           leading: Icon(Icons.volume_up),
                           onPressed: (BuildContext context) {
-                            shell.run("bash $path/commands/sound/up.sh");
-                          },
-                        ),
-                        SettingsTile(
-                          title: 'Sound down',
-                          leading: Icon(Icons.volume_down),
-                          onPressed: (BuildContext context) {
-                            shell.run("bash $path/commands/sound/down.sh");
+                            shell.run("bash $path/commands/sound/settings.sh");
                           },
                         ),
                         SettingsTile(
@@ -128,15 +117,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           title: 'Reboot',
                           leading: Icon(Icons.restart_alt),
                           onPressed: (BuildContext context) async {
-                            sudoWrapper(context, "/commands/actions/reboot.sh");
+                            shell.run("bash $path/commands/actions/reboot.sh");
                           },
                         ),
                         SettingsTile(
                           title: 'Power off',
                           leading: Icon(Icons.power_settings_new),
                           onPressed: (BuildContext context) async {
-                            sudoWrapper(
-                                context, "/commands/actions/shutdown.sh");
+                            shell.run("bash $path/commands/actions/shutdown.sh");
                           },
                         ),
                       ],
@@ -215,6 +203,18 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           );
         });
+  }
+
+
+
+
+  Future<void> sudoRunner(BuildContext context,String text) async {
+    await _displayTextInputDialog(context, "Enter Sudo password",true);
+    if(!(valueText == "")){
+      shell.run(
+          text);
+      valueText = "";
+    }
   }
 }
 

@@ -1,1 +1,1 @@
-echo $1 | sudo -S arandr
+arandr
