@@ -2,5 +2,7 @@
 Name=LinuxMenu
 Comment=A 3rd party settings menu for
 Exec=/opt/LinuxMenu/dwm_menu
+Icon=/opt/LinuxMenu/logo.png
+GenericName=Simple Linux Settings
 Type=Application
 StartupNotify=true
